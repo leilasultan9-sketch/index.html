@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Travel Mission Quiz</title>
+
+<style>
+*{box-sizing:border-box;}
+body{
+    margin:0;
+    font-family:Arial, Helvetica, sans-serif;
+    background:linear-gradient(135deg,#4facfe,#00f2fe);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+}
+.card{
+    background:white;
+    width:95%;
+    max-width:520px;
+    border-radius:20px;
+    padding:20px;
+    text-align:center;
+    box-shadow:0 10px 25px rgba(0,0,0,0.25);
+}
+h1{margin-top:0;}
+button{
+    width:100%;
+    padding:12px;
+    margin:8px 0;
+    border:none;
+    border-radius:12px;
+    font-size:16px;
+    cursor:pointer;
+}
+.option{background:#f2f2f2;}
+.option:hover{background:#d7e3ff;}
+.primary{background:#4facfe;color:white;}
+.hidden{display:none;}
+.timer{margin:10px 0;font-weight:bold;}
+.progress{font-size:14px;color:#666;margin-bottom:10px;}
+#feedback{font-weight:bold;height:24px;margin-top:5px;}
+input{
+    width:100%;
+    padding:10px;
+    border-radius:10px;
+    border:1px solid #ccc;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+<h1>✈️ Save Ben's Holiday</h1>
+
+<!-- START -->
+<div id="startScreen">
+<p>Enter your name:</p>
+<input id="playerName" placeholder="Your name">
+<br><br>
+<button class="primary" onclick="startQuiz()">Start</button>
+</div>
+
+<!-- QUIZ -->
+<div id="quizScreen" class="hidden">
+<div class="progress" id="progress"></div>
+<div class="timer">⏳ Time: <span id="time">10/pan></div>
+<h3 id="question"></h3>
+<div id="answers"></div>
+<div id="feedback"></div>
+</div>
+
+<!-- END -->
+<div id="endScreen" class="hidden">
+<h2 id="finalMessage"></h2>
+<p id="score"></p>
+<button class="primary" onclick="restartQuiz()">Play again</button>
+</div>
+
+</div>
+
+<script>
+let current = 0;
+let score = 0;
+let name = "";
+let timer;
+let timeLeft = 10;
+
+const quiz = [
+{
+q:"Ben is going on holiday…",
+options:["alone","with his cousins","with ten people"],
+correct:1
+},
+{
+q:"You do white-water rafting on…",
+options:["fast rivers","lakes","hot springs"],
+correct:0
+},
+{
+q:"The price to do white-water rafting includes…",
+options:["swimsuits","all safety equipment","towels"],
+correct:1
+},
+{
+q:"Ben will visit Chin-Turgen to see…",
+options:["waterfalls","fir forests","tunnel"],
+correct:1
+},
+{
+q:"Ben thinks he … enjoy the holiday.",
+options:["will","won’t","can’t"],
+correct:0
+},
+{
+q:"Is Ben excited about the trip?",
+options:["No, he isn’t","He is not sure","Yes, he is"],
+correct:2
+}
+];
+
+function startQuiz(){
+name = document.getElementById("playerName").value || "Agent";
+document.getElementById("startScreen").classList.add("hidden");
+document.getElementById("quizScreen").classList.remove("hidden");
+showQuestion();
+}
+
+function showQuestion(){
+resetTimer();
+document.getElementById("feedback").innerText="";
+document.getElementById("progress").innerText =
+"Question "+(current+1)+" / "+quiz.length;
+
+let q = quiz[current];
+document.getElementById("question").innerText = q.q;
+
+let answersDiv = document.getElementById("answers");
+answersDiv.innerHTML="";
+
+q.options.forEach((opt,i)=>{
+let btn=document.createElement("button");
+btn.innerText=opt;
+btn.className="option";
+btn.onclick=()=>checkAnswer(i);
+answersDiv.appendChild(btn);
+});
+
+startTimer();
+}
+
+function startTimer(){
+timeLeft = 10;
+document.getElementById("time").innerText = timeLeft;
+timer = setInterval(()=>{
+timeLeft--;
+document.getElementById("time").innerText = timeLeft;
+if(timeLeft===0){
+clearInterval(timer);
+autoNext();
+}
+},1000);
+}
+
+function resetTimer(){
+clearInterval(timer);
+}
+
+function checkAnswer(i){
+resetTimer();
+let correct = quiz[current].correct;
+
+let buttons = document.querySelectorAll(".option");
+buttons.forEach((b,index)=>{
+if(index===correct){b.style.background="#4CAF50";b.style.color="white";}
+else{b.style.background="#f44336";b.style.color="white";}
+b.disabled=true;
+});
+
+if(i===correct){score++;}
+
+setTimeout(nextQuestion,1200);
+}
+
+function autoNext(){
+document.getElementById("feedback").innerText="⏰ Time's up!";
+setTimeout(nextQuestion,1000);
+}
+
+function nextQuestion(){
+current++;
+if(current<quiz.length){
+showQuestion();
+}else{
+endQuiz();
+}
+}
+
+function endQuiz(){
+document.getElementById("quizScreen").classList.add("hidden");
+document.getElementById("endScreen").classList.remove("hidden");
+document.getElementById("finalMessage").innerText =
+"Great job, "+name+"!";
+document.getElementById("score").innerText =
+"Your score: "+score+" / "+quiz.length;
+}
+
+function restartQuiz(){
+current=0;
+score=0;
+document.getElementById("endScreen").classList.add("hidden");
+document.getElementById("startScreen").classList.remove("hidden");
+}
+</script>
+
+</body>
+</html>
